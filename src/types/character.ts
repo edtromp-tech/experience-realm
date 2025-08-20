@@ -35,46 +35,88 @@ export interface CharacterRace {
 
 export const CHARACTER_CLASSES: CharacterClass[] = [
   {
-    name: "Healer",
-    description: "Master of restoration and wellness",
-    primarySkill: "Health",
-    icon: "❤️",
-    color: "emerald"
+    name: "Barbarian",
+    description: "Raw strength and primal fury",
+    primarySkill: "Physical Training",
+    icon: "🪓",
+    color: "gold"
   },
   {
-    name: "Wizard",
-    description: "Wielder of mystical arts and energy",
-    primarySkill: "Energy Work",
-    icon: "🔮",
+    name: "Bard",
+    description: "Jack-of-all-trades and master of inspiration",
+    primarySkill: "Social Skills",
+    icon: "🎵",
     color: "mystical"
   },
   {
-    name: "Warrior",
-    description: "Strong and disciplined fighter",
+    name: "Cleric",
+    description: "Divine magic through spirituality and philosophy",
+    primarySkill: "Spiritual Practice",
+    icon: "✨",
+    color: "emerald"
+  },
+  {
+    name: "Druid",
+    description: "Nature's balance of strength, magic, and healing",
+    primarySkill: "Health & Fitness",
+    icon: "🌿",
+    color: "emerald"
+  },
+  {
+    name: "Fighter",
+    description: "Master of weapons and combat techniques",
     primarySkill: "Physical Training",
     icon: "⚔️",
     color: "gold"
   },
   {
-    name: "Archer",
-    description: "Precise and focused marksman",
-    primarySkill: "Precision",
+    name: "Monk",
+    description: "Martial arts, energy work, and inner balance",
+    primarySkill: "Energy Work",
+    icon: "👊",
+    color: "energy-blue"
+  },
+  {
+    name: "Paladin",
+    description: "Holy warrior combining healing and spirituality",
+    primarySkill: "Spiritual Practice",
+    icon: "🛡️",
+    color: "emerald"
+  },
+  {
+    name: "Ranger",
+    description: "Stealthy marksman with bow and guns",
+    primarySkill: "Adventure",
     icon: "🏹",
     color: "energy-blue"
   },
   {
-    name: "Scholar",
-    description: "Seeker of knowledge and wisdom",
-    primarySkill: "Learning",
-    icon: "📚",
+    name: "Rogue",
+    description: "Master of stealth, theft, and deception",
+    primarySkill: "Social Skills",
+    icon: "🗡️",
     color: "mystical"
   },
   {
-    name: "Artisan",
-    description: "Creator of beautiful works",
-    primarySkill: "Creativity",
-    icon: "🎨",
-    color: "gold"
+    name: "Sorcerer",
+    description: "Innate magical power and raw energy",
+    primarySkill: "Energy Work",
+    icon: "⚡",
+    color: "mystical"
+  },
+  {
+    name: "Warlock",
+    description: "Magic through pacts and animal companions",
+    primarySkill: "Energy Work",
+    icon: "🔮",
+    color: "mystical"
+  },
+  {
+    name: "Wizard",
+    description: "Learned magic through study and philosophy",
+    primarySkill: "Learning & Study",
+    icon: "📚",
+    color: "mystical"
   }
 ];
 

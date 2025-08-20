@@ -64,15 +64,19 @@ export const useCharacter = () => {
       if (dominantCategory) {
         // Map categories to classes
         const classMapping: Record<string, string> = {
-          "Health & Fitness": "Healer",
-          "Energy Work": "Wizard",
-          "Physical Training": "Warrior",
-          "Learning & Study": "Scholar",
-          "Creativity": "Artisan",
-          "Spiritual Practice": "Wizard"
+          "Health & Fitness": "Druid",
+          "Energy Work": "Monk",
+          "Physical Training": "Barbarian",
+          "Learning & Study": "Wizard",
+          "Creativity": "Bard",
+          "Leadership": "Paladin",
+          "Social Skills": "Bard",
+          "Technical Skills": "Wizard",
+          "Spiritual Practice": "Cleric",
+          "Adventure": "Ranger"
         };
 
-        const suggestedClassName = classMapping[dominantCategory] || "Warrior";
+        const suggestedClassName = classMapping[dominantCategory] || "Fighter";
         newClass = CHARACTER_CLASSES.find(cls => cls.name === suggestedClassName) || prev.currentClass;
       }
 
