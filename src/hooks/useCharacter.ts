@@ -61,6 +61,8 @@ export const useCharacter = () => {
         .sort(([,a], [,b]) => b - a)[0]?.[0];
 
       let newClass = prev.currentClass;
+      let newRace = prev.race;
+      
       if (dominantCategory) {
         // Map categories to classes
         const classMapping: Record<string, string> = {
@@ -78,6 +80,29 @@ export const useCharacter = () => {
 
         const suggestedClassName = classMapping[dominantCategory] || "Fighter";
         newClass = CHARACTER_CLASSES.find(cls => cls.name === suggestedClassName) || prev.currentClass;
+
+        // Map categories to races based on experience focus
+        const raceMapping: Record<string, string> = {
+          "Physical Training": "Orc",
+          "Technical Skills": "Dwarf",
+          "Creativity": "Dwarf",
+          "Energy Work": "Elf",
+          "Spiritual Practice": "Elf",
+          "Leadership": "Dragonborn",
+          "Adventure": "Halfling",
+          "Social Skills": "Drow",
+          "Learning & Study": "Gnome"
+        };
+
+        // Only auto-assign race if they don't have much experience yet (under 2000 XP) or if current race is Human
+        const shouldAutoAssignRace = newTotalXP < 2000 || prev.race?.name === "Human";
+        if (shouldAutoAssignRace) {
+          const suggestedRaceName = raceMapping[dominantCategory] || "Human";
+          const suggestedRace = CHARACTER_RACES.find(race => race.name === suggestedRaceName);
+          if (suggestedRace) {
+            newRace = suggestedRace;
+          }
+        }
       }
 
       return {
@@ -85,7 +110,8 @@ export const useCharacter = () => {
         experiences: newExperiences,
         totalXP: newTotalXP,
         level: newLevel,
-        currentClass: newClass
+        currentClass: newClass,
+        race: newRace
       };
     });
   };

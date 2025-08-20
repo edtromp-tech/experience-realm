@@ -124,26 +124,50 @@ export const CHARACTER_RACES: CharacterRace[] = [
   {
     name: "Human",
     description: "Adaptable and versatile",
-    traits: ["Balanced", "Quick Learner"],
+    traits: ["Balanced", "Quick Learner", "Versatile"],
     icon: "👤"
   },
   {
     name: "Elf",
     description: "Graceful and wise",
-    traits: ["Mystical Affinity", "Long-lived"],
+    traits: ["Mystical Affinity", "Long-lived", "Graceful"],
     icon: "🧝"
   },
   {
     name: "Dwarf",
     description: "Hardy and determined",
-    traits: ["Resilient", "Crafty"],
+    traits: ["Resilient", "Crafty", "Master Crafter"],
     icon: "🧙"
   },
   {
     name: "Orc",
     description: "Strong and fierce",
-    traits: ["Powerful", "Bold"],
+    traits: ["Powerful", "Bold", "Intimidating"],
     icon: "👹"
+  },
+  {
+    name: "Dragonborn",
+    description: "Noble and powerful",
+    traits: ["Dragon Heritage", "Elemental Breath", "Proud"],
+    icon: "🐉"
+  },
+  {
+    name: "Gnome",
+    description: "Small but clever",
+    traits: ["Ingenious", "Curious", "Tinker"],
+    icon: "🧚"
+  },
+  {
+    name: "Drow",
+    description: "Dark and mysterious",
+    traits: ["Shadow Magic", "Cunning", "Stealthy"],
+    icon: "🕸️"
+  },
+  {
+    name: "Halfling",
+    description: "Small and lucky",
+    traits: ["Lucky", "Brave", "Nimble"],
+    icon: "🍃"
   }
 ];
 
