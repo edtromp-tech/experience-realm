@@ -14,7 +14,86 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      characters: {
+        Row: {
+          created_at: string
+          current_class_name: string | null
+          id: string
+          level: number
+          name: string
+          race_name: string | null
+          total_xp: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          current_class_name?: string | null
+          id?: string
+          level?: number
+          name?: string
+          race_name?: string | null
+          total_xp?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          current_class_name?: string | null
+          id?: string
+          level?: number
+          name?: string
+          race_name?: string | null
+          total_xp?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      experiences: {
+        Row: {
+          category: string
+          character_id: string | null
+          created_at: string
+          date: string
+          description: string
+          id: string
+          notes: string | null
+          title: string
+          xp_gained: number
+        }
+        Insert: {
+          category: string
+          character_id?: string | null
+          created_at?: string
+          date?: string
+          description: string
+          id?: string
+          notes?: string | null
+          title: string
+          xp_gained: number
+        }
+        Update: {
+          category?: string
+          character_id?: string | null
+          created_at?: string
+          date?: string
+          description?: string
+          id?: string
+          notes?: string | null
+          title?: string
+          xp_gained?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "experiences_character_id_fkey"
+            columns: ["character_id"]
+            isOneToOne: false
+            referencedRelation: "characters"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
