@@ -137,7 +137,7 @@ export const CHARACTER_RACES: CharacterRace[] = [
     name: "Dwarf",
     description: "Hardy and determined",
     traits: ["Resilient", "Crafty", "Master Crafter"],
-    icon: "🧙"
+    icon: "⛏️"
   },
   {
     name: "Orc",
