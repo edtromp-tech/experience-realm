@@ -1,62 +1,109 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
+import { Badge } from "@/components/ui/badge";
 import { EXPERIENCE_CATEGORIES } from "@/types/character";
-import { Plus, Sparkles } from "lucide-react";
+import { searchExperiencePrompts, ExperiencePrompt } from "@/data/experiencePrompts";
+import { Plus, Sparkles, X } from "lucide-react";
 
 interface AddExperienceFormProps {
   onAddExperience: (experience: {
     title: string;
     description: string;
-    category: string;
+    categories: string[];
     xpGained: number;
-    notes?: string;
   }) => void;
+  forceOpen?: boolean;
 }
 
-export const AddExperienceForm = ({ onAddExperience }: AddExperienceFormProps) => {
-  const [isOpen, setIsOpen] = useState(false);
+export const AddExperienceForm = ({ onAddExperience, forceOpen = false }: AddExperienceFormProps) => {
+  const [isOpen, setIsOpen] = useState(forceOpen);
   const [formData, setFormData] = useState({
     title: "",
     description: "",
-    category: "",
-    xpGained: 10,
-    notes: "",
-    customCategory: ""
+    categories: [] as string[],
+    xpGained: 20
   });
+  const [titleQuery, setTitleQuery] = useState("");
+  const [suggestions, setSuggestions] = useState<ExperiencePrompt[]>([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [newCategory, setNewCategory] = useState("");
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  // Update suggestions when title changes
+  useEffect(() => {
+    if (titleQuery.trim()) {
+      setSuggestions(searchExperiencePrompts(titleQuery));
+      setShowSuggestions(true);
+    } else {
+      setSuggestions(searchExperiencePrompts("").slice(0, 3));
+      setShowSuggestions(titleQuery.length > 0);
+    }
+  }, [titleQuery]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    const category = formData.category === "Custom" ? formData.customCategory : formData.category;
-    
-    if (!formData.title || !formData.description || !category) return;
+    if (!formData.title || !formData.description || formData.categories.length === 0) return;
 
     onAddExperience({
       title: formData.title,
       description: formData.description,
-      category,
-      xpGained: formData.xpGained,
-      notes: formData.notes || undefined
+      categories: formData.categories,
+      xpGained: formData.xpGained
     });
 
     // Reset form
     setFormData({
       title: "",
       description: "",
-      category: "",
-      xpGained: 10,
-      notes: "",
-      customCategory: ""
+      categories: [],
+      xpGained: 20
     });
+    setTitleQuery("");
+    setNewCategory("");
+    setShowSuggestions(false);
     setIsOpen(false);
   };
 
-  if (!isOpen) {
+  const handleSuggestionClick = (suggestion: ExperiencePrompt) => {
+    setFormData({
+      title: suggestion.title,
+      description: suggestion.description,
+      categories: [...suggestion.categories],
+      xpGained: suggestion.xp
+    });
+    setTitleQuery(suggestion.title);
+    setShowSuggestions(false);
+  };
+
+  const addCategory = (category: string) => {
+    if (!formData.categories.includes(category)) {
+      setFormData(prev => ({
+        ...prev,
+        categories: [...prev.categories, category]
+      }));
+    }
+  };
+
+  const removeCategory = (category: string) => {
+    setFormData(prev => ({
+      ...prev,
+      categories: prev.categories.filter(c => c !== category)
+    }));
+  };
+
+  const handleAddNewCategory = () => {
+    if (newCategory.trim() && !formData.categories.includes(newCategory.trim())) {
+      addCategory(newCategory.trim());
+      setNewCategory("");
+    }
+  };
+
+  if (!isOpen && !forceOpen) {
     return (
       <Button 
         onClick={() => setIsOpen(true)}
@@ -80,15 +127,44 @@ export const AddExperienceForm = ({ onAddExperience }: AddExperienceFormProps) =
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
+          <div className="relative">
             <Label htmlFor="title">Experience Title</Label>
             <Input
+              ref={inputRef}
               id="title"
-              value={formData.title}
-              onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
-              placeholder="What did you accomplish?"
+              value={titleQuery}
+              onChange={(e) => {
+                setTitleQuery(e.target.value);
+                setFormData(prev => ({ ...prev, title: e.target.value }));
+              }}
+              placeholder="Start typing to see suggestions..."
               required
             />
+            
+            {showSuggestions && suggestions.length > 0 && (
+              <Card className="absolute z-10 w-full mt-1 max-h-60 overflow-y-auto">
+                <CardContent className="p-2">
+                  {suggestions.map((suggestion, index) => (
+                    <div
+                      key={index}
+                      className="p-2 hover:bg-accent rounded cursor-pointer"
+                      onClick={() => handleSuggestionClick(suggestion)}
+                    >
+                      <div className="font-medium text-sm">{suggestion.title}</div>
+                      <div className="text-xs text-muted-foreground">{suggestion.description}</div>
+                      <div className="flex gap-1 mt-1">
+                        {suggestion.categories.map((cat, i) => (
+                          <Badge key={i} variant="outline" className="text-xs">
+                            {cat}
+                          </Badge>
+                        ))}
+                        <Badge variant="secondary" className="text-xs">{suggestion.xp} XP</Badge>
+                      </div>
+                    </div>
+                  ))}
+                </CardContent>
+              </Card>
+            )}
           </div>
 
           <div>
@@ -103,58 +179,70 @@ export const AddExperienceForm = ({ onAddExperience }: AddExperienceFormProps) =
           </div>
 
           <div>
-            <Label htmlFor="category">Category</Label>
-            <Select
-              value={formData.category}
-              onValueChange={(value) => setFormData(prev => ({ ...prev, category: value }))}
-              required
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Select a category" />
-              </SelectTrigger>
-              <SelectContent>
-                {EXPERIENCE_CATEGORIES.map((category) => (
-                  <SelectItem key={category} value={category}>
+            <Label>Categories</Label>
+            <div className="space-y-2">
+              <div className="flex flex-wrap gap-2">
+                {formData.categories.map((category, index) => (
+                  <Badge key={index} variant="default" className="bg-mystical">
                     {category}
-                  </SelectItem>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      className="ml-1 h-auto p-0 w-4 h-4"
+                      onClick={() => removeCategory(category)}
+                    >
+                      <X className="h-3 w-3" />
+                    </Button>
+                  </Badge>
                 ))}
-              </SelectContent>
-            </Select>
+              </div>
+              
+              <div className="flex flex-wrap gap-1">
+                {EXPERIENCE_CATEGORIES.filter(cat => !formData.categories.includes(cat)).map((category) => (
+                  <Button
+                    key={category}
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => addCategory(category)}
+                    className="text-xs h-7"
+                  >
+                    {category}
+                  </Button>
+                ))}
+              </div>
+
+              <div className="flex gap-2">
+                <Input
+                  placeholder="Add custom category..."
+                  value={newCategory}
+                  onChange={(e) => setNewCategory(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), handleAddNewCategory())}
+                  className="flex-1"
+                />
+                <Button type="button" onClick={handleAddNewCategory} size="sm">
+                  Add
+                </Button>
+              </div>
+            </div>
           </div>
 
-          {formData.category === "Custom" && (
-            <div>
-              <Label htmlFor="customCategory">Custom Category</Label>
-              <Input
-                id="customCategory"
-                value={formData.customCategory}
-                onChange={(e) => setFormData(prev => ({ ...prev, customCategory: e.target.value }))}
-                placeholder="Enter custom category..."
-                required
-              />
-            </div>
-          )}
-
           <div>
-            <Label htmlFor="xp">Experience Points</Label>
+            <Label htmlFor="xp">Total Experience Points</Label>
             <Input
               id="xp"
               type="number"
               min="1"
               max="1000"
               value={formData.xpGained}
-              onChange={(e) => setFormData(prev => ({ ...prev, xpGained: parseInt(e.target.value) || 10 }))}
+              onChange={(e) => setFormData(prev => ({ ...prev, xpGained: parseInt(e.target.value) || 20 }))}
             />
-          </div>
-
-          <div>
-            <Label htmlFor="notes">Additional Notes (Optional)</Label>
-            <Textarea
-              id="notes"
-              value={formData.notes}
-              onChange={(e) => setFormData(prev => ({ ...prev, notes: e.target.value }))}
-              placeholder="Any additional thoughts or reflections..."
-            />
+            {formData.categories.length > 1 && (
+              <p className="text-xs text-muted-foreground mt-1">
+                {Math.floor(formData.xpGained / formData.categories.length)} XP per category
+              </p>
+            )}
           </div>
 
           <div className="flex gap-2">

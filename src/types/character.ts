@@ -2,10 +2,9 @@ export interface Experience {
   id: string;
   title: string;
   description: string;
-  category: string;
+  category: string[];
   xpGained: number;
   date: Date;
-  notes?: string;
 }
 
 export interface Character {

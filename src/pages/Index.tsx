@@ -1,32 +1,72 @@
 import { CharacterProfile } from "@/components/CharacterProfile";
-import { AddExperienceForm } from "@/components/AddExperienceForm";
 import { ExperienceList } from "@/components/ExperienceList";
+import { BottomNav } from "@/components/BottomNav";
 import { useCharacter } from "@/hooks/useCharacter";
+import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { CHARACTER_RACES } from "@/types/character";
-import { useState } from "react";
-import { Edit3, Crown } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Edit3, Crown, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useNavigate } from "react-router-dom";
 
 const Index = () => {
-  const { character, addExperience, updateCharacterName, setCharacterRace } = useCharacter();
+  const { isAuthenticated, loading: authLoading } = useAuth();
+  const { character, addExperience, updateCharacterName, setCharacterRace, loading: characterLoading } = useCharacter();
   const [isEditingName, setIsEditingName] = useState(false);
   const [tempName, setTempName] = useState(character.name);
   const { toast } = useToast();
+  const navigate = useNavigate();
+
+  // Update temp name when character name changes
+  useEffect(() => {
+    setTempName(character.name);
+  }, [character.name]);
+
+  // Redirect to auth if not authenticated
+  useEffect(() => {
+    if (!authLoading && !isAuthenticated) {
+      navigate("/auth");
+    }
+  }, [authLoading, isAuthenticated, navigate]);
+
+  // Show loading while checking authentication or loading character
+  if (authLoading || characterLoading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center p-4">
+        <div className="text-center">
+          <div className="flex items-center justify-center gap-2 mb-4">
+            <Crown className="h-8 w-8 text-gold" />
+            <h1 className="text-2xl font-bold bg-gradient-gold bg-clip-text text-transparent">
+              Loading...
+            </h1>
+          </div>
+          <Loader2 className="h-6 w-6 animate-spin mx-auto" />
+        </div>
+      </div>
+    );
+  }
+
+  // Don't render anything if not authenticated
+  if (!isAuthenticated) {
+    return null;
+  }
 
   const handleAddExperience = (experienceData: {
     title: string;
     description: string;
-    category: string;
+    categories: string[];
     xpGained: number;
-    notes?: string;
   }) => {
     addExperience(experienceData);
+    const categoryText = experienceData.categories.length > 1 
+      ? `${experienceData.categories.length} categories` 
+      : experienceData.categories[0];
     toast({
       title: "Experience Gained! ✨",
-      description: `You earned ${experienceData.xpGained} XP for "${experienceData.title}"`,
+      description: `You earned ${experienceData.xpGained} XP in ${categoryText} for "${experienceData.title}"`,
       duration: 3000,
     });
   };
@@ -39,7 +79,7 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background p-4 space-y-6">
+    <div className="min-h-screen bg-background p-4 pb-24 space-y-6">
       {/* Header */}
       <div className="text-center mb-8">
         <div className="flex items-center justify-center gap-2 mb-2">
@@ -120,18 +160,14 @@ const Index = () => {
 
       {/* Character Profile */}
       <div className="max-w-md mx-auto">
-        <CharacterProfile character={character} />
+        <CharacterProfile 
+          character={character} 
+          onViewAllExperiences={() => {}} 
+        />
       </div>
 
-      {/* Add Experience Form */}
-      <div className="max-w-md mx-auto">
-        <AddExperienceForm onAddExperience={handleAddExperience} />
-      </div>
-
-      {/* Experience List */}
-      <div className="max-w-md mx-auto">
-        <ExperienceList experiences={character.experiences} />
-      </div>
+      {/* Bottom Navigation */}
+      <BottomNav onAddExperience={handleAddExperience} />
     </div>
   );
 };
