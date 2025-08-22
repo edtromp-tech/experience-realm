@@ -16,10 +16,11 @@ interface AddExperienceFormProps {
     xpGained: number;
     notes?: string;
   }) => void;
+  forceOpen?: boolean;
 }
 
-export const AddExperienceForm = ({ onAddExperience }: AddExperienceFormProps) => {
-  const [isOpen, setIsOpen] = useState(false);
+export const AddExperienceForm = ({ onAddExperience, forceOpen = false }: AddExperienceFormProps) => {
+  const [isOpen, setIsOpen] = useState(forceOpen);
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -56,7 +57,7 @@ export const AddExperienceForm = ({ onAddExperience }: AddExperienceFormProps) =
     setIsOpen(false);
   };
 
-  if (!isOpen) {
+  if (!isOpen && !forceOpen) {
     return (
       <Button 
         onClick={() => setIsOpen(true)}

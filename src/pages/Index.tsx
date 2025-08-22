@@ -1,6 +1,6 @@
 import { CharacterProfile } from "@/components/CharacterProfile";
-import { AddExperienceForm } from "@/components/AddExperienceForm";
 import { ExperienceList } from "@/components/ExperienceList";
+import { BottomNav } from "@/components/BottomNav";
 import { useCharacter } from "@/hooks/useCharacter";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
@@ -8,12 +8,12 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { CHARACTER_RACES } from "@/types/character";
 import { useState, useEffect } from "react";
-import { Edit3, Crown, LogOut, Loader2 } from "lucide-react";
+import { Edit3, Crown, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 
 const Index = () => {
-  const { isAuthenticated, loading: authLoading, signOut } = useAuth();
+  const { isAuthenticated, loading: authLoading } = useAuth();
   const { character, addExperience, updateCharacterName, setCharacterRace, loading: characterLoading } = useCharacter();
   const [isEditingName, setIsEditingName] = useState(false);
   const [tempName, setTempName] = useState(character.name);
@@ -77,20 +77,9 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background p-4 space-y-6">
+    <div className="min-h-screen bg-background p-4 pb-24 space-y-6">
       {/* Header */}
-      <div className="text-center mb-8 relative">
-        <div className="absolute top-0 right-4">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={signOut}
-            className="text-muted-foreground hover:text-foreground"
-          >
-            <LogOut className="h-4 w-4 mr-1" />
-            Sign Out
-          </Button>
-        </div>
+      <div className="text-center mb-8">
         <div className="flex items-center justify-center gap-2 mb-2">
           <Crown className="h-8 w-8 text-gold" />
           <h1 className="text-4xl font-bold bg-gradient-gold bg-clip-text text-transparent">
@@ -175,10 +164,8 @@ const Index = () => {
         />
       </div>
 
-      {/* Add Experience Form */}
-      <div className="max-w-md mx-auto">
-        <AddExperienceForm onAddExperience={handleAddExperience} />
-      </div>
+      {/* Bottom Navigation */}
+      <BottomNav onAddExperience={handleAddExperience} />
     </div>
   );
 };
