@@ -2,12 +2,14 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { Character } from "@/types/character";
+import { CategoryXPBadges } from "./CategoryXPBadges";
 
 interface CharacterProfileProps {
   character: Character;
+  onViewAllExperiences?: () => void;
 }
 
-export const CharacterProfile = ({ character }: CharacterProfileProps) => {
+export const CharacterProfile = ({ character, onViewAllExperiences }: CharacterProfileProps) => {
   const levelProgress = (character.totalXP % 1000) / 10; // Progress to next level
   const nextLevelXP = Math.ceil(character.totalXP / 1000) * 1000;
 
@@ -35,6 +37,12 @@ export const CharacterProfile = ({ character }: CharacterProfileProps) => {
           </div>
           <Progress value={levelProgress} className="h-3" />
         </div>
+
+        {/* Category XP Badges */}
+        <CategoryXPBadges 
+          experiences={character.experiences} 
+          onViewAllExperiences={onViewAllExperiences || (() => {})}
+        />
 
         {/* Character Class & Race */}
         <div className="grid grid-cols-2 gap-4">

@@ -169,17 +169,15 @@ const Index = () => {
 
       {/* Character Profile */}
       <div className="max-w-md mx-auto">
-        <CharacterProfile character={character} />
+        <CharacterProfile 
+          character={character} 
+          onViewAllExperiences={() => {}} 
+        />
       </div>
 
       {/* Add Experience Form */}
       <div className="max-w-md mx-auto">
         <AddExperienceForm onAddExperience={handleAddExperience} />
-      </div>
-
-      {/* Experience List */}
-      <div className="max-w-md mx-auto">
-        <ExperienceList experiences={character.experiences} />
       </div>
     </div>
   );
