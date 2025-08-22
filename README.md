@@ -1,13 +1,17 @@
 # Welcome to your Lovable project
 ## Timeline
-* Authentication
+~~* Authentication~~
 * Edit Logs
-* Group Logs with drop downs
+~~* Group Logs with drop downs~~
 * Read Book Experience Template
-* Work Out Experience Template 
+~~* Work Out Experience Template~~
 * Connect with friends
 * Leaderboards
 * Should I make experience logs more static?
+* Add time frame that calculates the amount of XP
+* Refine experience templates
+* Add the ability to lock your race with an lock icon button by the race drop down
+* Move the name editor to the Account button
 
 
 ## Project info
