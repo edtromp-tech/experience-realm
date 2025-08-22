@@ -14,9 +14,8 @@ interface BottomNavProps {
   onAddExperience: (experience: {
     title: string;
     description: string;
-    category: string;
+    categories: string[];
     xpGained: number;
-    notes?: string;
   }) => void;
 }
 
@@ -27,9 +26,8 @@ export const BottomNav = ({ onAddExperience }: BottomNavProps) => {
   const handleAddExperience = (experienceData: {
     title: string;
     description: string;
-    category: string;
+    categories: string[];
     xpGained: number;
-    notes?: string;
   }) => {
     onAddExperience(experienceData);
     setShowAddForm(false);

@@ -56,19 +56,23 @@ export const ExperienceList = ({ experiences }: ExperienceListProps) => {
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <Calendar className="h-4 w-4" />
               {format(new Date(experience.date), "MMM dd, yyyy")}
-              <Badge variant="outline" className="text-xs">
-                {experience.category}
-              </Badge>
+              <div className="flex gap-1">
+                {(Array.isArray(experience.category) ? experience.category : [experience.category]).map((cat, index) => (
+                  <Badge key={index} variant="outline" className="text-xs">
+                    {cat}
+                  </Badge>
+                ))}
+              </div>
             </div>
           </CardHeader>
           <CardContent className="pt-0">
             <p className="text-sm text-foreground/80 mb-2">
               {experience.description}
             </p>
-            {experience.notes && (
+            {(Array.isArray(experience.category) ? experience.category : [experience.category]).length > 1 && (
               <div className="p-2 bg-secondary/30 rounded border-l-2 border-mystical">
-                <p className="text-xs text-muted-foreground italic">
-                  "{experience.notes}"
+                <p className="text-xs text-muted-foreground">
+                  XP distributed: {Math.floor(experience.xpGained / (Array.isArray(experience.category) ? experience.category : [experience.category]).length)} XP per category
                 </p>
               </div>
             )}

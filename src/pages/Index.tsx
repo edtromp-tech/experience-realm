@@ -57,14 +57,16 @@ const Index = () => {
   const handleAddExperience = (experienceData: {
     title: string;
     description: string;
-    category: string;
+    categories: string[];
     xpGained: number;
-    notes?: string;
   }) => {
     addExperience(experienceData);
+    const categoryText = experienceData.categories.length > 1 
+      ? `${experienceData.categories.length} categories` 
+      : experienceData.categories[0];
     toast({
       title: "Experience Gained! ✨",
-      description: `You earned ${experienceData.xpGained} XP for "${experienceData.title}"`,
+      description: `You earned ${experienceData.xpGained} XP in ${categoryText} for "${experienceData.title}"`,
       duration: 3000,
     });
   };

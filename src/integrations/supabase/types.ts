@@ -52,7 +52,7 @@ export type Database = {
       }
       experiences: {
         Row: {
-          category: string
+          category: string[]
           character_id: string | null
           created_at: string
           date: string
@@ -63,7 +63,7 @@ export type Database = {
           xp_gained: number
         }
         Insert: {
-          category: string
+          category?: string[]
           character_id?: string | null
           created_at?: string
           date?: string
@@ -74,7 +74,7 @@ export type Database = {
           xp_gained: number
         }
         Update: {
-          category?: string
+          category?: string[]
           character_id?: string | null
           created_at?: string
           date?: string

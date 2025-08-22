@@ -23,19 +23,27 @@ const CATEGORY_EMOJIS: Record<string, string> = {
 };
 
 export const CategoryXPBadges = ({ experiences, onViewAllExperiences }: CategoryXPBadgesProps) => {
-  // Calculate XP per category
-  const categoryXP = experiences.reduce((acc, exp) => {
-    acc[exp.category] = (acc[exp.category] || 0) + exp.xpGained;
+  const categoryTotals = experiences.reduce((acc, exp) => {
+    // Handle both old single category format and new array format  
+    const categories = Array.isArray(exp.category) ? exp.category : [exp.category];
+    const xpPerCategory = Math.floor(exp.xpGained / categories.length);
+    
+    categories.forEach(cat => {
+      acc[cat] = (acc[cat] || 0) + xpPerCategory;
+    });
     return acc;
   }, {} as Record<string, number>);
 
   // Filter out categories with no XP
-  const categoriesWithXP = Object.entries(categoryXP)
+  const categoriesWithXP = Object.entries(categoryTotals)
     .filter(([, xp]) => xp > 0)
     .sort(([, a], [, b]) => b - a); // Sort by XP descending
 
   const getCategoryExperiences = (category: string) => {
-    return experiences.filter(exp => exp.category === category);
+    return experiences.filter(exp => {
+      const categories = Array.isArray(exp.category) ? exp.category : [exp.category];
+      return categories.includes(category);
+    });
   };
 
   return (

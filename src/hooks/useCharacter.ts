@@ -56,7 +56,6 @@ export const useCharacter = () => {
               description: exp.description,
               category: exp.category,
               xpGained: exp.xp_gained,
-              notes: exp.notes,
               date: new Date(exp.date)
             }));
           }
@@ -134,9 +133,8 @@ export const useCharacter = () => {
   const addExperience = async (experienceData: {
     title: string;
     description: string;
-    category: string;
+    categories: string[];
     xpGained: number;
-    notes?: string;
   }) => {
     if (!user) return;
 
@@ -148,9 +146,8 @@ export const useCharacter = () => {
           character_id: character.id,
           title: experienceData.title,
           description: experienceData.description,
-          category: experienceData.category,
-          xp_gained: experienceData.xpGained,
-          notes: experienceData.notes
+          category: experienceData.categories,
+          xp_gained: experienceData.xpGained
         }])
         .select()
         .single();
@@ -166,18 +163,24 @@ export const useCharacter = () => {
         description: newExp.description,
         category: newExp.category,
         xpGained: newExp.xp_gained,
-        notes: newExp.notes,
         date: new Date(newExp.date)
       };
 
-      const newTotalXP = character.totalXP + experienceData.xpGained;
+      // Calculate XP per category and update character stats
+      const xpPerCategory = Math.floor(experienceData.xpGained / experienceData.categories.length);
+      const totalXpToAdd = xpPerCategory * experienceData.categories.length;
+      
+      const newTotalXP = character.totalXP + totalXpToAdd;
       const newLevel = Math.floor(newTotalXP / 1000) + 1;
       const newExperiences = [newExperience, ...character.experiences];
       
       // Determine class based on experiences
       const categoryCount: Record<string, number> = {};
       newExperiences.forEach(exp => {
-        categoryCount[exp.category] = (categoryCount[exp.category] || 0) + exp.xpGained;
+        const categories = Array.isArray(exp.category) ? exp.category : [exp.category];
+        categories.forEach(cat => {
+          categoryCount[cat] = (categoryCount[cat] || 0) + Math.floor(exp.xpGained / categories.length);
+        });
       });
 
       // Find the category with the most XP
