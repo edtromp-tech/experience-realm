@@ -103,7 +103,7 @@ export const AddExperienceForm = ({ onAddExperience, forceOpen = false }: AddExp
     }
   };
 
-  if (!isOpen && !forceOpen) {
+  if (!isOpen) {
     return (
       <Button 
         onClick={() => setIsOpen(true)}
