@@ -233,8 +233,8 @@ export const AddExperienceForm = ({ onAddExperience, forceOpen = false }: AddExp
             <Input
               id="xp"
               type="number"
-              min="1"
-              max="1000"
+              min="0"
+              max="100"
               value={formData.xpGained}
               onChange={(e) => setFormData(prev => ({ ...prev, xpGained: parseInt(e.target.value) || 20 }))}
             />
