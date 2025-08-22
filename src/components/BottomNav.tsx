@@ -51,44 +51,6 @@ export const BottomNav = ({ onAddExperience }: BottomNavProps) => {
                   <p className="text-sm text-muted-foreground">Signed in as:</p>
                   <p className="text-sm font-medium truncate">{user?.email}</p>
                 </div>
-                      {/* Character Name Editor */}
-      <div className="max-w-md mx-auto mb-6">
-        {isEditingName ? (
-          <div className="flex gap-2">
-            <Input
-              value={tempName}
-              onChange={(e) => setTempName(e.target.value)}
-              placeholder="Character name..."
-              className="text-center"
-              onKeyDown={(e) => e.key === 'Enter' && handleNameUpdate()}
-            />
-            <Button onClick={handleNameUpdate} size="sm" className="bg-gradient-mystical">
-              Save
-            </Button>
-            <Button 
-              onClick={() => {
-                setIsEditingName(false);
-                setTempName(character.name);
-              }} 
-              variant="outline" 
-              size="sm"
-            >
-              Cancel
-            </Button>
-          </div>
-        ) : (
-          <div className="flex items-center justify-center gap-2">
-            <span className="text-lg font-semibold text-gold">{character.name}</span>
-            <Button
-              onClick={() => setIsEditingName(true)}
-              variant="ghost"
-              size="sm"
-            >
-              <Edit3 className="h-4 w-4" />
-            </Button>
-          </div>
-        )}
-      </div>
                 <Button
                   variant="ghost"
                   className="w-full justify-start text-left"
