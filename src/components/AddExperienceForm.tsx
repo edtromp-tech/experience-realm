@@ -117,7 +117,7 @@ export const AddExperienceForm = ({ onAddExperience, forceOpen = false }: AddExp
     );
   }
 */
-if (isOpen) {
+if (!isOpen) {
   return (
     <Card className="border-gold shadow-glow-gold bg-gradient-to-br from-card to-secondary/30">
       <CardHeader>
@@ -254,7 +254,7 @@ if (isOpen) {
             <Button 
               type="button" 
               variant="outline" 
-              onClick={() => setIsOpen(false)}
+              onClick={() => setIsOpen(true)}
               className="border-muted"
             >
               Cancel
