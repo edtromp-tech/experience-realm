@@ -10,7 +10,7 @@ import { useNavigate } from "react-router-dom";
 
 const Index = () => {
   const { isAuthenticated, loading: authLoading } = useAuth();
-  const { character, addExperience, updateCharacterName, setCharacterRace, toggleRaceLock, loading: characterLoading } = useCharacter();
+  const { character, addExperience, editExperience, deleteExperience, updateCharacterName, setCharacterRace, toggleRaceLock, loading: characterLoading } = useCharacter();
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -77,10 +77,17 @@ const Index = () => {
 
 
       {/* Character Profile */}
-      <div className="max-w-md mx-auto">
+      <div className="max-w-md mx-auto space-y-6">
         <CharacterProfile 
           character={character} 
           onViewAllExperiences={() => {}} 
+        />
+        
+        {/* Experience List */}
+        <ExperienceList 
+          experiences={character.experiences}
+          onEditExperience={editExperience}
+          onDeleteExperience={deleteExperience}
         />
       </div>
 

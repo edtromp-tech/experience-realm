@@ -1,14 +1,32 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Experience } from "@/types/character";
-import { Calendar, Star, Scroll } from "lucide-react";
+import { Calendar, Star, Scroll, Edit, Trash2 } from "lucide-react";
 import { format } from "date-fns";
+import { useState } from "react";
+import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import { 
+  AlertDialog, 
+  AlertDialogAction, 
+  AlertDialogCancel, 
+  AlertDialogContent, 
+  AlertDialogDescription, 
+  AlertDialogFooter, 
+  AlertDialogHeader, 
+  AlertDialogTitle, 
+  AlertDialogTrigger 
+} from "@/components/ui/alert-dialog";
+import { EditExperienceForm } from "./EditExperienceForm";
 
 interface ExperienceListProps {
   experiences: Experience[];
+  onEditExperience?: (id: string, experience: { title: string; description: string; categories: string[]; xpGained: number; }) => void;
+  onDeleteExperience?: (id: string) => void;
 }
 
-export const ExperienceList = ({ experiences }: ExperienceListProps) => {
+export const ExperienceList = ({ experiences, onEditExperience, onDeleteExperience }: ExperienceListProps) => {
+  const [editingId, setEditingId] = useState<string | null>(null);
   const sortedExperiences = [...experiences].sort((a, b) => 
     new Date(b.date).getTime() - new Date(a.date).getTime()
   );
@@ -43,10 +61,57 @@ export const ExperienceList = ({ experiences }: ExperienceListProps) => {
         >
           <CardHeader className="pb-2">
             <div className="flex justify-between items-start">
-              <CardTitle className="text-base text-foreground">
+              <CardTitle className="text-base text-foreground flex-1 pr-2">
                 {experience.title}
               </CardTitle>
               <div className="flex items-center gap-2">
+                {(onEditExperience || onDeleteExperience) && (
+                  <div className="flex gap-1">
+                    {onEditExperience && (
+                      <Dialog>
+                        <DialogTrigger asChild>
+                          <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                        </DialogTrigger>
+                        <DialogContent className="max-w-md">
+                          <EditExperienceForm
+                            experience={experience}
+                            onEditExperience={(updatedExp) => {
+                              onEditExperience(experience.id, updatedExp);
+                            }}
+                          />
+                        </DialogContent>
+                      </Dialog>
+                    )}
+                    {onDeleteExperience && (
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <Button variant="ghost" size="sm" className="h-8 w-8 p-0 text-destructive hover:text-destructive">
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Delete Experience</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              Are you sure you want to delete "{experience.title}"? This action cannot be undone.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogAction 
+                              onClick={() => onDeleteExperience(experience.id)}
+                              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                            >
+                              Delete
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                    )}
+                  </div>
+                )}
                 <Badge variant="secondary" className="bg-gradient-gold text-background">
                   <Star className="h-3 w-3 mr-1" />
                   {experience.xpGained} XP

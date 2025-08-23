@@ -311,9 +311,133 @@ export const useCharacter = () => {
     }
   };
 
+  const editExperience = async (id: string, experienceData: {
+    title: string;
+    description: string;
+    categories: string[];
+    xpGained: number;
+  }) => {
+    if (!user) return;
+
+    try {
+      // Update experience in database
+      const { error } = await supabase
+        .from('experiences')
+        .update({
+          title: experienceData.title,
+          description: experienceData.description,
+          category: experienceData.categories,
+          xp_gained: experienceData.xpGained
+        })
+        .eq('id', id);
+
+      if (error) {
+        console.error('Error updating experience:', error);
+        return;
+      }
+
+      // Update local state
+      const updatedExperiences = character.experiences.map(exp => 
+        exp.id === id 
+          ? {
+              ...exp,
+              title: experienceData.title,
+              description: experienceData.description,
+              category: experienceData.categories,
+              xpGained: experienceData.xpGained
+            }
+          : exp
+      );
+
+      // Recalculate total XP and level
+      const oldExperience = character.experiences.find(exp => exp.id === id);
+      if (!oldExperience) return;
+
+      const oldXpPerCategory = Math.floor(oldExperience.xpGained / (Array.isArray(oldExperience.category) ? oldExperience.category.length : 1));
+      const oldTotalXp = oldXpPerCategory * (Array.isArray(oldExperience.category) ? oldExperience.category.length : 1);
+      
+      const newXpPerCategory = Math.floor(experienceData.xpGained / experienceData.categories.length);
+      const newTotalXp = newXpPerCategory * experienceData.categories.length;
+      
+      const xpDifference = newTotalXp - oldTotalXp;
+      const newTotalCharacterXP = character.totalXP + xpDifference;
+      const newLevel = Math.floor(newTotalCharacterXP / 1000) + 1;
+
+      // Update character stats in database
+      await supabase
+        .from('characters')
+        .update({
+          total_xp: newTotalCharacterXP,
+          level: newLevel
+        })
+        .eq('id', character.id);
+
+      setCharacter(prev => ({
+        ...prev,
+        experiences: updatedExperiences,
+        totalXP: newTotalCharacterXP,
+        level: newLevel
+      }));
+    } catch (error) {
+      console.error('Error in editExperience:', error);
+    }
+  };
+
+  const deleteExperience = async (id: string) => {
+    if (!user) return;
+
+    try {
+      // Find the experience to be deleted
+      const experienceToDelete = character.experiences.find(exp => exp.id === id);
+      if (!experienceToDelete) return;
+
+      // Delete experience from database
+      const { error } = await supabase
+        .from('experiences')
+        .delete()
+        .eq('id', id);
+
+      if (error) {
+        console.error('Error deleting experience:', error);
+        return;
+      }
+
+      // Calculate XP to subtract
+      const categories = Array.isArray(experienceToDelete.category) ? experienceToDelete.category : [experienceToDelete.category];
+      const xpPerCategory = Math.floor(experienceToDelete.xpGained / categories.length);
+      const totalXpToSubtract = xpPerCategory * categories.length;
+      
+      const newTotalXP = Math.max(0, character.totalXP - totalXpToSubtract);
+      const newLevel = Math.floor(newTotalXP / 1000) + 1;
+      
+      // Update character stats in database
+      await supabase
+        .from('characters')
+        .update({
+          total_xp: newTotalXP,
+          level: newLevel
+        })
+        .eq('id', character.id);
+
+      // Update local state
+      const updatedExperiences = character.experiences.filter(exp => exp.id !== id);
+      
+      setCharacter(prev => ({
+        ...prev,
+        experiences: updatedExperiences,
+        totalXP: newTotalXP,
+        level: newLevel
+      }));
+    } catch (error) {
+      console.error('Error in deleteExperience:', error);
+    }
+  };
+
   return {
     character,
     addExperience,
+    editExperience,
+    deleteExperience,
     updateCharacterName,
     setCharacterRace,
     toggleRaceLock,
