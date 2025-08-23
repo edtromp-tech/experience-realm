@@ -21,6 +21,7 @@ export type Database = {
           id: string
           level: number
           name: string
+          race_locked: boolean
           race_name: string | null
           total_xp: number
           updated_at: string
@@ -32,6 +33,7 @@ export type Database = {
           id?: string
           level?: number
           name?: string
+          race_locked?: boolean
           race_name?: string | null
           total_xp?: number
           updated_at?: string
@@ -43,6 +45,7 @@ export type Database = {
           id?: string
           level?: number
           name?: string
+          race_locked?: boolean
           race_name?: string | null
           total_xp?: number
           updated_at?: string

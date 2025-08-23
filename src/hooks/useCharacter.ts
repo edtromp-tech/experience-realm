@@ -12,6 +12,7 @@ export const useCharacter = () => {
     totalXP: 0,
     currentClass: null,
     race: CHARACTER_RACES[0],
+    raceLocked: false,
     experiences: []
   });
   const [loading, setLoading] = useState(true);
@@ -78,6 +79,7 @@ export const useCharacter = () => {
             totalXP: characters.total_xp,
             currentClass,
             race,
+            raceLocked: characters.race_locked || false,
             experiences
           });
         } else {
@@ -123,6 +125,7 @@ export const useCharacter = () => {
         totalXP: newCharacter.total_xp,
         currentClass: null,
         race: CHARACTER_RACES[0],
+        raceLocked: false,
         experiences: []
       });
     } catch (error) {
@@ -222,7 +225,8 @@ export const useCharacter = () => {
         };
 
         // Only auto-assign race if they don't have much experience yet (under 2000 XP) or if current race is Human
-        const shouldAutoAssignRace = newTotalXP < 2000 || character.race?.name === "Human";
+        // AND if race is not locked
+        const shouldAutoAssignRace = !character.raceLocked && (newTotalXP < 2000 || character.race?.name === "Human");
         if (shouldAutoAssignRace) {
           const suggestedRaceName = raceMapping[dominantCategory] || "Human";
           const suggestedRace = CHARACTER_RACES.find(race => race.name === suggestedRaceName);
@@ -291,11 +295,28 @@ export const useCharacter = () => {
     }
   };
 
+  const toggleRaceLock = async () => {
+    if (!user) return;
+
+    try {
+      const newLockState = !character.raceLocked;
+      await supabase
+        .from('characters')
+        .update({ race_locked: newLockState })
+        .eq('id', character.id);
+
+      setCharacter(prev => ({ ...prev, raceLocked: newLockState }));
+    } catch (error) {
+      console.error('Error toggling race lock:', error);
+    }
+  };
+
   return {
     character,
     addExperience,
     updateCharacterName,
     setCharacterRace,
+    toggleRaceLock,
     loading
   };
 };

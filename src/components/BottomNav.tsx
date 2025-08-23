@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Plus, BarChart3, User, LogOut, Edit3 } from "lucide-react";
+import { Plus, BarChart3, User, LogOut, Edit3, Lock, Unlock } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { AddExperienceForm } from "@/components/AddExperienceForm";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -23,9 +23,10 @@ interface BottomNavProps {
   character: Character;
   updateCharacterName: (name: string) => void;
   setCharacterRace: (race: string) => void;
+  toggleRaceLock: () => void;
 }
 
-export const BottomNav = ({ onAddExperience, character, updateCharacterName, setCharacterRace }: BottomNavProps) => {
+export const BottomNav = ({ onAddExperience, character, updateCharacterName, setCharacterRace, toggleRaceLock }: BottomNavProps) => {
   const { user, signOut } = useAuth();
   const [showAddForm, setShowAddForm] = useState(false);
   const [isEditingName, setIsEditingName] = useState(false);
@@ -103,12 +104,24 @@ export const BottomNav = ({ onAddExperience, character, updateCharacterName, set
 
                 {/* Race Selector */}
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-gold">Character Race</label>
+                  <div className="flex items-center justify-between">
+                    <label className="text-sm font-medium text-gold">Character Race</label>
+                    <Button
+                      onClick={toggleRaceLock}
+                      variant="ghost"
+                      size="sm"
+                      className={`h-8 w-8 p-0 ${character.raceLocked ? 'text-gold' : 'text-muted-foreground'}`}
+                      title={character.raceLocked ? 'Race is locked - click to unlock' : 'Race can change automatically - click to lock'}
+                    >
+                      {character.raceLocked ? <Lock className="h-4 w-4" /> : <Unlock className="h-4 w-4" />}
+                    </Button>
+                  </div>
                   <Select
                     value={character.race?.name || ""}
                     onValueChange={(value) => setCharacterRace(value)}
+                    disabled={character.raceLocked}
                   >
-                    <SelectTrigger className="bg-secondary/50">
+                    <SelectTrigger className={`bg-secondary/50 ${character.raceLocked ? 'opacity-60' : ''}`}>
                       <SelectValue placeholder="Select a race" />
                     </SelectTrigger>
                     <SelectContent>
@@ -125,6 +138,9 @@ export const BottomNav = ({ onAddExperience, character, updateCharacterName, set
                       ))}
                     </SelectContent>
                   </Select>
+                  {character.raceLocked && (
+                    <p className="text-xs text-muted-foreground">Race is locked and won't change with new experiences</p>
+                  )}
                 </div>
 
                 {/* Sign Out */}

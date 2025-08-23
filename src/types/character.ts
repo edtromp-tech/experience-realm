@@ -14,6 +14,7 @@ export interface Character {
   totalXP: number;
   currentClass: CharacterClass | null;
   race: CharacterRace | null;
+  raceLocked: boolean;
   experiences: Experience[];
 }
 

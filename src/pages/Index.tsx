@@ -10,7 +10,7 @@ import { useNavigate } from "react-router-dom";
 
 const Index = () => {
   const { isAuthenticated, loading: authLoading } = useAuth();
-  const { character, addExperience, updateCharacterName, setCharacterRace, loading: characterLoading } = useCharacter();
+  const { character, addExperience, updateCharacterName, setCharacterRace, toggleRaceLock, loading: characterLoading } = useCharacter();
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -90,6 +90,7 @@ const Index = () => {
         character={character}
         updateCharacterName={updateCharacterName}
         setCharacterRace={setCharacterRace}
+        toggleRaceLock={toggleRaceLock}
       />
     </div>
   );
