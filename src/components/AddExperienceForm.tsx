@@ -102,7 +102,7 @@ export const AddExperienceForm = ({ onAddExperience, forceOpen = false }: AddExp
       setNewCategory("");
     }
   };
-
+/*
   if (!isOpen) {
     return (
       <Button 
@@ -116,7 +116,7 @@ export const AddExperienceForm = ({ onAddExperience, forceOpen = false }: AddExp
       </Button>
     );
   }
-
+*/
   return (
     <Card className="border-gold shadow-glow-gold bg-gradient-to-br from-card to-secondary/30">
       <CardHeader>
