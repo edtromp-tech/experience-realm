@@ -1,8 +1,11 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Plus, BarChart3, User, LogOut } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Plus, BarChart3, User, LogOut, Edit3 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { AddExperienceForm } from "@/components/AddExperienceForm";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { CHARACTER_RACES, Character } from "@/types/character";
 import {
   Popover,
   PopoverContent,
@@ -17,11 +20,16 @@ interface BottomNavProps {
     categories: string[];
     xpGained: number;
   }) => void;
+  character: Character;
+  updateCharacterName: (name: string) => void;
+  setCharacterRace: (race: string) => void;
 }
 
-export const BottomNav = ({ onAddExperience }: BottomNavProps) => {
+export const BottomNav = ({ onAddExperience, character, updateCharacterName, setCharacterRace }: BottomNavProps) => {
   const { user, signOut } = useAuth();
   const [showAddForm, setShowAddForm] = useState(false);
+  const [isEditingName, setIsEditingName] = useState(false);
+  const [tempName, setTempName] = useState(character.name);
 
   const handleAddExperience = (experienceData: {
     title: string;
@@ -31,6 +39,13 @@ export const BottomNav = ({ onAddExperience }: BottomNavProps) => {
   }) => {
     onAddExperience(experienceData);
     setShowAddForm(false);
+  };
+
+  const handleNameUpdate = () => {
+    if (tempName.trim()) {
+      updateCharacterName(tempName.trim());
+      setIsEditingName(false);
+    }
   };
 
   return (
@@ -45,20 +60,84 @@ export const BottomNav = ({ onAddExperience }: BottomNavProps) => {
                 <span className="text-xs">Account</span>
               </Button>
             </PopoverTrigger>
-            <PopoverContent className="w-64 mb-2" align="start">
-              <div className="space-y-3">
+            <PopoverContent className="w-80 mb-2" align="start">
+              <div className="space-y-4">
+                {/* User Info */}
                 <div className="border-b border-border pb-3">
                   <p className="text-sm text-muted-foreground">Signed in as:</p>
                   <p className="text-sm font-medium truncate">{user?.email}</p>
                 </div>
-                <Button
-                  variant="ghost"
-                  className="w-full justify-start text-left"
-                  onClick={signOut}
-                >
-                  <LogOut className="mr-2 h-4 w-4" />
-                  Sign Out
-                </Button>
+
+                {/* Character Name Editor */}
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-gold">Character Name</label>
+                  {isEditingName ? (
+                    <div className="flex gap-2">
+                      <Input
+                        value={tempName}
+                        onChange={(e) => setTempName(e.target.value)}
+                        placeholder="Character name..."
+                        onKeyDown={(e) => e.key === 'Enter' && handleNameUpdate()}
+                        className="flex-1"
+                      />
+                      <Button onClick={handleNameUpdate} size="sm" className="bg-gradient-mystical">
+                        Save
+                      </Button>
+                    </div>
+                  ) : (
+                    <div className="flex items-center justify-between">
+                      <span className="font-medium text-gold">{character.name}</span>
+                      <Button
+                        onClick={() => {
+                          setIsEditingName(true);
+                          setTempName(character.name);
+                        }}
+                        variant="ghost"
+                        size="sm"
+                      >
+                        <Edit3 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  )}
+                </div>
+
+                {/* Race Selector */}
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-gold">Character Race</label>
+                  <Select
+                    value={character.race?.name || ""}
+                    onValueChange={(value) => setCharacterRace(value)}
+                  >
+                    <SelectTrigger className="bg-secondary/50">
+                      <SelectValue placeholder="Select a race" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {CHARACTER_RACES.map((race) => (
+                        <SelectItem key={race.name} value={race.name}>
+                          <div className="flex items-center gap-2">
+                            <span className="text-lg">{race.icon}</span>
+                            <div>
+                              <div className="font-medium">{race.name}</div>
+                              <div className="text-xs text-muted-foreground">{race.description}</div>
+                            </div>
+                          </div>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* Sign Out */}
+                <div className="pt-2 border-t border-border">
+                  <Button
+                    variant="ghost"
+                    className="w-full justify-start text-left"
+                    onClick={signOut}
+                  >
+                    <LogOut className="mr-2 h-4 w-4" />
+                    Sign Out
+                  </Button>
+                </div>
               </div>
             </PopoverContent>
           </Popover>
