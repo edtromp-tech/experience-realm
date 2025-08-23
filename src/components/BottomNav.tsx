@@ -169,7 +169,10 @@ export const BottomNav = ({ onAddExperience, character, updateCharacterName, set
               </Button>
             </DialogTrigger>
             <DialogContent className="max-w-md">
-              <AddExperienceForm onAddExperience={handleAddExperience} />
+              <AddExperienceForm 
+                onAddExperience={handleAddExperience} 
+                onCancel={() => setShowAddForm(false)} // 👈 tell form how to close dialog
+              />
             </DialogContent>
           </Dialog>
 

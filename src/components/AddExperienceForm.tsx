@@ -16,17 +16,17 @@ interface AddExperienceFormProps {
     categories: string[];
     xpGained: number;
   }) => void;
-  forceOpen?: boolean;
+  onCancel: () => void; 
 }
 
-export const AddExperienceForm = ({ onAddExperience, forceOpen = false }: AddExperienceFormProps) => {
-  const [isOpen, setIsOpen] = useState(forceOpen);
+export const AddExperienceForm = ({ onAddExperience, onCancel }: AddExperienceFormProps) => {
   const [formData, setFormData] = useState({
     title: "",
     description: "",
     categories: [] as string[],
     xpGained: 20
   });
+
   const [titleQuery, setTitleQuery] = useState("");
   const [suggestions, setSuggestions] = useState<ExperiencePrompt[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
@@ -56,17 +56,9 @@ export const AddExperienceForm = ({ onAddExperience, forceOpen = false }: AddExp
       xpGained: formData.xpGained
     });
 
-    // Reset form
-    setFormData({
-      title: "",
-      description: "",
-      categories: [],
-      xpGained: 20
-    });
-    setTitleQuery("");
-    setNewCategory("");
-    setShowSuggestions(false);
-    setIsOpen(false);
+      // reset fields (optional)
+    setFormData({ title: "", description: "", categories: [], xpGained: 20 });
+    onCancel(); // close the dialog after submit
   };
 
   const handleSuggestionClick = (suggestion: ExperiencePrompt) => {
@@ -102,23 +94,9 @@ export const AddExperienceForm = ({ onAddExperience, forceOpen = false }: AddExp
       setNewCategory("");
     }
   };
-/*
-  if (!isOpen) {
-    return (
-      <Button 
-        onClick={() => setIsOpen(true)}
-        className="w-full bg-gradient-gold text-background hover:shadow-glow-gold transition-all duration-300"
-        size="lg"
-      >
-        <Plus className="mr-2 h-5 w-5" />
-        Add New Experience
-        <Sparkles className="ml-2 h-4 w-4" />
-      </Button>
-    );
-  }
-*/
-{isOpen && (
 
+
+return (
     <Card className="border-gold shadow-glow-gold bg-gradient-to-br from-card to-secondary/30">
       <CardHeader>
         <CardTitle className="text-gold flex items-center gap-2">
@@ -254,7 +232,7 @@ export const AddExperienceForm = ({ onAddExperience, forceOpen = false }: AddExp
             <Button 
               type="button" 
               variant="outline" 
-              onClick={() => setIsOpen(false)}
+              onClick={onCancel}  // 👈 this closes the dialog
               className="border-muted"
             >
               Cancel
@@ -265,4 +243,4 @@ export const AddExperienceForm = ({ onAddExperience, forceOpen = false }: AddExp
     </Card>
   );
 };
-};
+
