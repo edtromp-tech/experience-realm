@@ -1,10 +1,10 @@
 # Welcome to your Lovable project
 ## Timeline
-~~* Authentication~~
+* ~~Authentication~~
 * Edit Logs
-~~* Group Logs with drop downs~~
+* ~~Group Logs with drop downs~~
 * Read Book Experience Template
-~~* Work Out Experience Template~~
+* ~~Work Out Experience Template~~
 * Connect with friends
 * Leaderboards
 * Should I make experience logs more static?
