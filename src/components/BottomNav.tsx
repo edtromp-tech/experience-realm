@@ -74,7 +74,7 @@ export const BottomNav = ({ onAddExperience }: BottomNavProps) => {
               </Button>
             </DialogTrigger>
             <DialogContent className="max-w-md">
-              <AddExperienceForm onAddExperience={handleAddExperience} forceOpen={true} />
+              <AddExperienceForm onAddExperience={handleAddExperience} />
             </DialogContent>
           </Dialog>
 
