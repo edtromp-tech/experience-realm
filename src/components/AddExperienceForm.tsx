@@ -117,7 +117,7 @@ export const AddExperienceForm = ({ onAddExperience, forceOpen = false }: AddExp
     );
   }
 */
-if (!isOpen) {
+
   return (
     <Card className="border-gold shadow-glow-gold bg-gradient-to-br from-card to-secondary/30">
       <CardHeader>
@@ -264,5 +264,5 @@ if (!isOpen) {
       </CardContent>
     </Card>
   );
-};
+
 };
