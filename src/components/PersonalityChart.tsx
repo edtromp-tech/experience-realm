@@ -1,7 +1,7 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
-import { Experience, EXPERIENCE_CATEGORIES } from "@/types/character";
-import { Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ResponsiveContainer, Legend } from "recharts";
+import { Experience, CHARACTER_RACES } from "@/types/character";
+import { Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ResponsiveContainer } from "recharts";
 
 interface PersonalityChartProps {
   open: boolean;
@@ -18,7 +18,7 @@ export const PersonalityChart = ({
   title, 
   subtitle 
 }: PersonalityChartProps) => {
-  // Calculate XP per category
+  // Calculate XP per category first
   const categoryXP: Record<string, number> = {};
   let totalXP = 0;
 
@@ -32,23 +32,56 @@ export const PersonalityChart = ({
     });
   });
 
-  // Prepare radar chart data - include all categories for consistent spider web
-  const radarData = EXPERIENCE_CATEGORIES.map(category => {
-    const xp = categoryXP[category] || 0;
+  // Map categories to races (same logic as useCharacter)
+  const raceMapping: Record<string, string> = {
+    "Physical Training": "Orc",
+    "Technical Skills": "Dwarf", 
+    "Creativity": "Dwarf",
+    "Energy Work": "Elf",
+    "Spiritual Practice": "Elf",
+    "Leadership": "Dragonborn",
+    "Adventure": "Halfling",
+    "Social Skills": "Drow",
+    "Learning & Study": "Gnome"
+  };
+
+  // Calculate XP per race
+  const raceXP: Record<string, number> = {};
+  
+  // Initialize all races to 0
+  CHARACTER_RACES.forEach(race => {
+    raceXP[race.name] = 0;
+  });
+
+  // Add XP to races based on category mapping
+  Object.entries(categoryXP).forEach(([category, xp]) => {
+    const raceName = raceMapping[category];
+    if (raceName && raceXP[raceName] !== undefined) {
+      raceXP[raceName] += xp;
+    } else {
+      // Unmapped categories contribute to Human (balanced/versatile)
+      raceXP["Human"] += xp;
+    }
+  });
+
+  // Prepare radar chart data for races
+  const radarData = CHARACTER_RACES.map(race => {
+    const xp = raceXP[race.name];
     const normalizedValue = totalXP > 0 ? Math.round((xp / totalXP) * 100) : 0;
     
     return {
-      category: category.replace(" & ", "\n& "), // Line break for better display
+      race: race.name,
       xp: xp,
       value: normalizedValue,
-      fullName: category
+      icon: race.icon,
+      traits: race.traits.join(", ")
     };
-  }).filter(item => item.xp > 0 || totalXP === 0); // Show all if no XP, only active if has XP
+  }).filter(item => item.xp > 0 || totalXP === 0);
 
-  // Sort categories by XP amount for the summary
-  const sortedCategories = EXPERIENCE_CATEGORIES
-    .filter(cat => categoryXP[cat] > 0)
-    .sort((a, b) => (categoryXP[b] || 0) - (categoryXP[a] || 0));
+  // Sort races by XP amount for the summary
+  const sortedRaces = CHARACTER_RACES
+    .filter(race => raceXP[race.name] > 0)
+    .sort((a, b) => raceXP[b.name] - raceXP[a.name]);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -87,13 +120,13 @@ export const PersonalityChart = ({
                       strokeOpacity={0.3}
                     />
                     <PolarAngleAxis 
-                      dataKey="category" 
+                      dataKey="race" 
                       tick={{ 
-                        fontSize: 10, 
+                        fontSize: 12, 
                         fill: "hsl(var(--foreground))",
                         textAnchor: 'middle'
                       }}
-                      className="text-xs"
+                      className="text-sm font-medium"
                     />
                     <PolarRadiusAxis 
                       angle={0} 
@@ -101,34 +134,40 @@ export const PersonalityChart = ({
                       tick={{ fontSize: 8, fill: "hsl(var(--muted-foreground))" }}
                     />
                     <Radar
-                      name="XP Distribution"
+                      name="Race Alignment"
                       dataKey="value"
                       stroke="hsl(var(--gold))"
                       fill="hsl(var(--gold))"
                       fillOpacity={0.2}
-                      strokeWidth={2}
-                      dot={{ fill: "hsl(var(--gold))", strokeWidth: 2, r: 4 }}
+                      strokeWidth={3}
+                      dot={{ fill: "hsl(var(--gold))", strokeWidth: 2, r: 5 }}
                     />
                   </RadarChart>
                 </ResponsiveContainer>
               </div>
 
-              {/* Top 3 Categories Summary */}
-              {sortedCategories.length > 0 && (
+              {/* Top 3 Races Summary */}
+              {sortedRaces.length > 0 && (
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  {sortedCategories.slice(0, 3).map((category, index) => (
-                    <div key={category} className="p-4 rounded-lg bg-secondary/50 border text-center">
-                      <Badge variant="secondary" className="mb-2">
-                        #{index + 1}
-                      </Badge>
+                  {sortedRaces.slice(0, 3).map((race, index) => (
+                    <div key={race.name} className="p-4 rounded-lg bg-secondary/50 border text-center">
+                      <div className="flex items-center justify-center gap-2 mb-2">
+                        <span className="text-2xl">{race.icon}</span>
+                        <Badge variant="secondary">
+                          #{index + 1}
+                        </Badge>
+                      </div>
                       <div className="font-semibold text-gold text-sm mb-1">
-                        {category}
+                        {race.name}
                       </div>
                       <div className="text-lg font-bold text-foreground">
-                        {categoryXP[category].toLocaleString()}
+                        {raceXP[race.name].toLocaleString()}
+                      </div>
+                      <div className="text-xs text-muted-foreground mb-2">
+                        {((raceXP[race.name] / totalXP) * 100).toFixed(1)}% alignment
                       </div>
                       <div className="text-xs text-muted-foreground">
-                        {((categoryXP[category] / totalXP) * 100).toFixed(1)}% of total XP
+                        {race.traits.slice(0, 2).join(", ")}
                       </div>
                     </div>
                   ))}
@@ -138,19 +177,19 @@ export const PersonalityChart = ({
               {/* Personality Insights */}
               <div className="p-4 rounded-lg bg-gradient-mystical/20 border-mystical/30">
                 <h4 className="font-semibold text-gold mb-2 text-center">
-                  🔮 Personality Insights
+                  🔮 Racial Alignment
                 </h4>
                 <div className="text-sm text-center text-muted-foreground">
-                  {sortedCategories.length > 0 && (
+                  {sortedRaces.length > 0 && (
                     <p>
-                      Your strongest trait is <span className="text-gold font-semibold">{sortedCategories[0]}</span>
-                      {sortedCategories.length > 1 && (
-                        <>, with developing skills in <span className="text-mystical font-semibold">{sortedCategories[1]}</span></>
+                      You align most closely with the <span className="text-gold font-semibold">{sortedRaces[0].name}</span> race
+                      {sortedRaces.length > 1 && (
+                        <>, with traits of <span className="text-mystical font-semibold">{sortedRaces[1].name}</span></>
                       )}
-                      {sortedCategories.length > 2 && (
-                        <> and <span className="text-emerald font-semibold">{sortedCategories[2]}</span></>
+                      {sortedRaces.length > 2 && (
+                        <> and hints of <span className="text-emerald font-semibold">{sortedRaces[2].name}</span></>
                       )}
-                      . This makes you a well-rounded adventurer!
+                      . Your experiences shape your character's heritage!
                     </p>
                   )}
                 </div>
