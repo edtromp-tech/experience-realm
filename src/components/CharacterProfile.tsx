@@ -3,6 +3,8 @@ import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { Character } from "@/types/character";
 import { CategoryXPBadges } from "./CategoryXPBadges";
+import { PersonalityChart } from "./PersonalityChart";
+import { useState } from "react";
 
 interface CharacterProfileProps {
   character: Character;
@@ -10,8 +12,18 @@ interface CharacterProfileProps {
 }
 
 export const CharacterProfile = ({ character, onViewAllExperiences }: CharacterProfileProps) => {
+  const [showPersonalityChart, setShowPersonalityChart] = useState(false);
+  const [chartTitle, setChartTitle] = useState("");
+  const [chartSubtitle, setChartSubtitle] = useState("");
+  
   const levelProgress = (character.totalXP % 1000) / 10; // Progress to next level
   const nextLevelXP = Math.ceil(character.totalXP / 1000) * 1000;
+
+  const handleShowChart = (title: string, subtitle: string) => {
+    setChartTitle(title);
+    setChartSubtitle(subtitle);
+    setShowPersonalityChart(true);
+  };
 
   return (
     <Card className="bg-gradient-mystical border-mystical shadow-glow-mystical">
@@ -47,7 +59,13 @@ export const CharacterProfile = ({ character, onViewAllExperiences }: CharacterP
         {/* Character Class & Race */}
         <div className="grid grid-cols-2 gap-4">
           {character.currentClass && (
-            <div className="text-center p-3 rounded-lg bg-secondary/50 border">
+            <div 
+              className="text-center p-3 rounded-lg bg-secondary/50 border cursor-pointer hover:bg-secondary/70 transition-colors"
+              onClick={() => handleShowChart(
+                character.currentClass!.name, 
+                `Class focus: ${character.currentClass!.primarySkill}`
+              )}
+            >
               <div className="text-2xl mb-1">{character.currentClass.icon}</div>
               <div className="font-semibold text-gold">{character.currentClass.name}</div>
               <div className="text-xs text-muted-foreground">
@@ -57,7 +75,13 @@ export const CharacterProfile = ({ character, onViewAllExperiences }: CharacterP
           )}
           
           {character.race && (
-            <div className="text-center p-3 rounded-lg bg-secondary/50 border">
+            <div 
+              className="text-center p-3 rounded-lg bg-secondary/50 border cursor-pointer hover:bg-secondary/70 transition-colors"
+              onClick={() => handleShowChart(
+                character.race!.name, 
+                `Traits: ${character.race!.traits.join(", ")}`
+              )}
+            >
               <div className="text-2xl mb-1">{character.race.icon}</div>
               <div className="font-semibold text-gold">{character.race.name}</div>
               <div className="text-xs text-muted-foreground">
@@ -85,6 +109,14 @@ export const CharacterProfile = ({ character, onViewAllExperiences }: CharacterP
           </div>
         </div>
       </CardContent>
+      
+      <PersonalityChart
+        open={showPersonalityChart}
+        onOpenChange={setShowPersonalityChart}
+        experiences={character.experiences}
+        title={chartTitle}
+        subtitle={chartSubtitle}
+      />
     </Card>
   );
 };
