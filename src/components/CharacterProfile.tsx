@@ -15,13 +15,15 @@ export const CharacterProfile = ({ character, onViewAllExperiences }: CharacterP
   const [showPersonalityChart, setShowPersonalityChart] = useState(false);
   const [chartTitle, setChartTitle] = useState("");
   const [chartSubtitle, setChartSubtitle] = useState("");
+  const [chartType, setChartType] = useState<"race" | "class">("race");
   
   const levelProgress = (character.totalXP % 1000) / 10; // Progress to next level
   const nextLevelXP = Math.ceil(character.totalXP / 1000) * 1000;
 
-  const handleShowChart = (title: string, subtitle: string) => {
+  const handleShowChart = (title: string, subtitle: string, type: "race" | "class") => {
     setChartTitle(title);
     setChartSubtitle(subtitle);
+    setChartType(type);
     setShowPersonalityChart(true);
   };
 
@@ -63,7 +65,8 @@ export const CharacterProfile = ({ character, onViewAllExperiences }: CharacterP
               className="text-center p-3 rounded-lg bg-secondary/50 border cursor-pointer hover:bg-secondary/70 transition-colors"
               onClick={() => handleShowChart(
                 character.currentClass!.name, 
-                `Class focus: ${character.currentClass!.primarySkill}`
+                `Class focus: ${character.currentClass!.primarySkill}`,
+                "class"
               )}
             >
               <div className="text-2xl mb-1">{character.currentClass.icon}</div>
@@ -79,7 +82,8 @@ export const CharacterProfile = ({ character, onViewAllExperiences }: CharacterP
               className="text-center p-3 rounded-lg bg-secondary/50 border cursor-pointer hover:bg-secondary/70 transition-colors"
               onClick={() => handleShowChart(
                 character.race!.name, 
-                `Traits: ${character.race!.traits.join(", ")}`
+                `Traits: ${character.race!.traits.join(", ")}`,
+                "race"
               )}
             >
               <div className="text-2xl mb-1">{character.race.icon}</div>
@@ -116,6 +120,7 @@ export const CharacterProfile = ({ character, onViewAllExperiences }: CharacterP
         experiences={character.experiences}
         title={chartTitle}
         subtitle={chartSubtitle}
+        type={chartType}
       />
     </Card>
   );

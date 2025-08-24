@@ -1,6 +1,6 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
-import { Experience, CHARACTER_RACES } from "@/types/character";
+import { Experience, CHARACTER_RACES, CHARACTER_CLASSES } from "@/types/character";
 import { Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ResponsiveContainer } from "recharts";
 
 interface PersonalityChartProps {
@@ -9,6 +9,7 @@ interface PersonalityChartProps {
   experiences: Experience[];
   title: string;
   subtitle: string;
+  type: "race" | "class";
 }
 
 export const PersonalityChart = ({ 
@@ -16,7 +17,8 @@ export const PersonalityChart = ({
   onOpenChange, 
   experiences, 
   title, 
-  subtitle 
+  subtitle,
+  type 
 }: PersonalityChartProps) => {
   // Calculate XP per category first
   const categoryXP: Record<string, number> = {};
@@ -32,63 +34,125 @@ export const PersonalityChart = ({
     });
   });
 
-  // Map categories to races (same logic as useCharacter)
-  const raceMapping: Record<string, string> = {
-    "Physical Training": "Orc",
-    "Technical Skills": "Dwarf", 
-    "Creativity": "Dwarf",
-    "Energy Work": "Elf",
-    "Spiritual Practice": "Elf",
-    "Leadership": "Dragonborn",
-    "Adventure": "Halfling",
-    "Social Skills": "Drow",
-    "Learning & Study": "Gnome"
+  const getChartData = () => {
+    if (type === "race") {
+      // Map categories to races (same logic as useCharacter)
+      const raceMapping: Record<string, string> = {
+        "Physical Training": "Orc",
+        "Technical Skills": "Dwarf", 
+        "Creativity": "Dwarf",
+        "Energy Work": "Elf",
+        "Spiritual Practice": "Elf",
+        "Leadership": "Dragonborn",
+        "Adventure": "Halfling",
+        "Social Skills": "Drow",
+        "Learning & Study": "Gnome"
+      };
+
+      // Calculate XP per race
+      const raceXP: Record<string, number> = {};
+      
+      // Initialize all races to 0
+      CHARACTER_RACES.forEach(race => {
+        raceXP[race.name] = 0;
+      });
+
+      // Add XP to races based on category mapping
+      Object.entries(categoryXP).forEach(([category, xp]) => {
+        const raceName = raceMapping[category];
+        if (raceName && raceXP[raceName] !== undefined) {
+          raceXP[raceName] += xp;
+        } else {
+          // Unmapped categories contribute to Human (balanced/versatile)
+          raceXP["Human"] += xp;
+        }
+      });
+
+      // Prepare radar chart data for races
+      const radarData = CHARACTER_RACES.map(race => {
+        const xp = raceXP[race.name];
+        const normalizedValue = totalXP > 0 ? Math.round((xp / totalXP) * 100) : 0;
+        
+        return {
+          name: race.name,
+          xp: xp,
+          value: normalizedValue,
+          icon: race.icon,
+          description: race.traits.join(", ")
+        };
+      }).filter(item => item.xp > 0 || totalXP === 0);
+
+      // Sort races by XP amount for the summary
+      const sortedItems = CHARACTER_RACES
+        .filter(race => raceXP[race.name] > 0)
+        .sort((a, b) => raceXP[b.name] - raceXP[a.name]);
+
+      return { radarData, sortedItems, itemXP: raceXP };
+    } else {
+      // Map categories to classes (same logic as useCharacter)
+      const classMapping: Record<string, string> = {
+        "Health & Fitness": "Druid",
+        "Energy Work": "Monk",
+        "Physical Training": "Barbarian", 
+        "Learning & Study": "Wizard",
+        "Creativity": "Bard",
+        "Leadership": "Paladin",
+        "Social Skills": "Bard",
+        "Technical Skills": "Wizard",
+        "Spiritual Practice": "Cleric",
+        "Adventure": "Ranger"
+      };
+
+      // Calculate XP per class
+      const classXP: Record<string, number> = {};
+      
+      // Initialize all classes to 0
+      CHARACTER_CLASSES.forEach(cls => {
+        classXP[cls.name] = 0;
+      });
+
+      // Add XP to classes based on category mapping
+      Object.entries(categoryXP).forEach(([category, xp]) => {
+        const className = classMapping[category];
+        if (className && classXP[className] !== undefined) {
+          classXP[className] += xp;
+        } else {
+          // Unmapped categories contribute to Fighter (balanced fighter)
+          classXP["Fighter"] += xp;
+        }
+      });
+
+      // Prepare radar chart data for classes
+      const radarData = CHARACTER_CLASSES.map(cls => {
+        const xp = classXP[cls.name];
+        const normalizedValue = totalXP > 0 ? Math.round((xp / totalXP) * 100) : 0;
+        
+        return {
+          name: cls.name,
+          xp: xp,
+          value: normalizedValue,
+          icon: cls.icon,
+          description: cls.description
+        };
+      }).filter(item => item.xp > 0 || totalXP === 0);
+
+      // Sort classes by XP amount for the summary
+      const sortedItems = CHARACTER_CLASSES
+        .filter(cls => classXP[cls.name] > 0)
+        .sort((a, b) => classXP[b.name] - classXP[a.name]);
+
+      return { radarData, sortedItems, itemXP: classXP };
+    }
   };
 
-  // Calculate XP per race
-  const raceXP: Record<string, number> = {};
-  
-  // Initialize all races to 0
-  CHARACTER_RACES.forEach(race => {
-    raceXP[race.name] = 0;
-  });
-
-  // Add XP to races based on category mapping
-  Object.entries(categoryXP).forEach(([category, xp]) => {
-    const raceName = raceMapping[category];
-    if (raceName && raceXP[raceName] !== undefined) {
-      raceXP[raceName] += xp;
-    } else {
-      // Unmapped categories contribute to Human (balanced/versatile)
-      raceXP["Human"] += xp;
-    }
-  });
-
-  // Prepare radar chart data for races
-  const radarData = CHARACTER_RACES.map(race => {
-    const xp = raceXP[race.name];
-    const normalizedValue = totalXP > 0 ? Math.round((xp / totalXP) * 100) : 0;
-    
-    return {
-      race: race.name,
-      xp: xp,
-      value: normalizedValue,
-      icon: race.icon,
-      traits: race.traits.join(", ")
-    };
-  }).filter(item => item.xp > 0 || totalXP === 0);
-
-  // Sort races by XP amount for the summary
-  const sortedRaces = CHARACTER_RACES
-    .filter(race => raceXP[race.name] > 0)
-    .sort((a, b) => raceXP[b.name] - raceXP[a.name]);
+  const { radarData, sortedItems, itemXP } = getChartData();
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl bg-gradient-to-br from-card to-secondary/30 border-gold">
         <DialogHeader>
           <DialogTitle className="text-gold text-center">
-            {title} Personality Web
+            {title} {type === "race" ? "Racial" : "Class"} Web
           </DialogTitle>
           <p className="text-center text-muted-foreground text-sm">
             {subtitle}
@@ -120,7 +184,7 @@ export const PersonalityChart = ({
                       strokeOpacity={0.3}
                     />
                     <PolarAngleAxis 
-                      dataKey="race" 
+                      dataKey="name" 
                       tick={{ 
                         fontSize: 12, 
                         fill: "hsl(var(--foreground))",
@@ -134,7 +198,7 @@ export const PersonalityChart = ({
                       tick={{ fontSize: 8, fill: "hsl(var(--muted-foreground))" }}
                     />
                     <Radar
-                      name="Race Alignment"
+                      name={`${type === "race" ? "Race" : "Class"} Alignment`}
                       dataKey="value"
                       stroke="hsl(var(--gold))"
                       fill="hsl(var(--gold))"
@@ -146,28 +210,31 @@ export const PersonalityChart = ({
                 </ResponsiveContainer>
               </div>
 
-              {/* Top 3 Races Summary */}
-              {sortedRaces.length > 0 && (
+              {/* Top 3 Items Summary */}
+              {sortedItems.length > 0 && (
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  {sortedRaces.slice(0, 3).map((race, index) => (
-                    <div key={race.name} className="p-4 rounded-lg bg-secondary/50 border text-center">
+                  {sortedItems.slice(0, 3).map((item, index) => (
+                    <div key={item.name} className="p-4 rounded-lg bg-secondary/50 border text-center">
                       <div className="flex items-center justify-center gap-2 mb-2">
-                        <span className="text-2xl">{race.icon}</span>
+                        <span className="text-2xl">{item.icon}</span>
                         <Badge variant="secondary">
                           #{index + 1}
                         </Badge>
                       </div>
                       <div className="font-semibold text-gold text-sm mb-1">
-                        {race.name}
+                        {item.name}
                       </div>
                       <div className="text-lg font-bold text-foreground">
-                        {raceXP[race.name].toLocaleString()}
+                        {itemXP[item.name].toLocaleString()}
                       </div>
                       <div className="text-xs text-muted-foreground mb-2">
-                        {((raceXP[race.name] / totalXP) * 100).toFixed(1)}% alignment
+                        {((itemXP[item.name] / totalXP) * 100).toFixed(1)}% alignment
                       </div>
                       <div className="text-xs text-muted-foreground">
-                        {race.traits.slice(0, 2).join(", ")}
+                        {type === "race" ? 
+                          item.traits?.slice(0, 2).join(", ") : 
+                          item.description
+                        }
                       </div>
                     </div>
                   ))}
@@ -177,19 +244,19 @@ export const PersonalityChart = ({
               {/* Personality Insights */}
               <div className="p-4 rounded-lg bg-gradient-mystical/20 border-mystical/30">
                 <h4 className="font-semibold text-gold mb-2 text-center">
-                  🔮 Racial Alignment
+                  🔮 {type === "race" ? "Racial" : "Class"} Alignment
                 </h4>
                 <div className="text-sm text-center text-muted-foreground">
-                  {sortedRaces.length > 0 && (
+                  {sortedItems.length > 0 && (
                     <p>
-                      You align most closely with the <span className="text-gold font-semibold">{sortedRaces[0].name}</span> race
-                      {sortedRaces.length > 1 && (
-                        <>, with traits of <span className="text-mystical font-semibold">{sortedRaces[1].name}</span></>
+                      You align most closely with the <span className="text-gold font-semibold">{sortedItems[0].name}</span> {type}
+                      {sortedItems.length > 1 && (
+                        <>, with traits of <span className="text-mystical font-semibold">{sortedItems[1].name}</span></>
                       )}
-                      {sortedRaces.length > 2 && (
-                        <> and hints of <span className="text-emerald font-semibold">{sortedRaces[2].name}</span></>
+                      {sortedItems.length > 2 && (
+                        <> and hints of <span className="text-emerald font-semibold">{sortedItems[2].name}</span></>
                       )}
-                      . Your experiences shape your character's heritage!
+                      . Your experiences shape your character's {type === "race" ? "heritage" : "abilities"}!
                     </p>
                   )}
                 </div>
