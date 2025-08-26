@@ -177,9 +177,15 @@ export const BottomNav = ({ onAddExperience, character, updateCharacterName, set
           </Dialog>
 
           {/* Dashboard Button */}
-          <Button variant="ghost" className="flex flex-col items-center gap-1 h-auto py-2 opacity-50" disabled>
-            <BarChart3 className="h-5 w-5" />
-            <span className="text-xs">Dashboard</span>
+          <Button 
+            variant="ghost" 
+            className="flex flex-col items-center gap-1 h-auto py-2"
+            asChild
+          >
+            <a href="/dashboard">
+              <BarChart3 className="h-5 w-5" />
+              <span className="text-xs">Dashboard</span>
+            </a>
           </Button>
         </div>
       </nav>
