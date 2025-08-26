@@ -92,14 +92,14 @@ export const EditExperienceForm = ({ experience, onEditExperience }: EditExperie
   };
 
   return (
-    <Card className="border-gold shadow-glow-gold bg-gradient-to-br from-card to-secondary/30">
-      <CardHeader>
+    <Card className="border-gold shadow-glow-gold bg-gradient-to-br from-card to-secondary/30 max-h-[80vh] flex flex-col">
+      <CardHeader className="shrink-0">
         <CardTitle className="text-gold flex items-center gap-2">
           <Sparkles className="h-5 w-5" />
           Edit Experience
         </CardTitle>
       </CardHeader>
-      <CardContent>
+      <CardContent className="overflow-y-auto pr-2 flex-1">
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="relative">
             <Label htmlFor="title">Experience Title</Label>
@@ -219,7 +219,7 @@ export const EditExperienceForm = ({ experience, onEditExperience }: EditExperie
             )}
           </div>
 
-          <div className="flex gap-2">
+          <div className="flex gap-2 sticky bottom-0 bg-gradient-to-br from-card to-secondary/30 pt-2">
             <Button type="submit" className="flex-1 bg-gradient-mystical hover:shadow-glow-mystical">
               <Sparkles className="mr-2 h-4 w-4" />
               Update Experience
