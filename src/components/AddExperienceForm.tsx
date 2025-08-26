@@ -6,7 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { EXPERIENCE_CATEGORIES } from "@/types/character";
-import { searchExperiencePrompts, ExperiencePrompt } from "@/data/experiencePrompts";
+import { useExperiencePrompts, ExperiencePrompt } from "@/hooks/useExperiencePrompts";
 import { Plus, Sparkles, X } from "lucide-react";
 
 interface AddExperienceFormProps {
@@ -20,6 +20,8 @@ interface AddExperienceFormProps {
 }
 
 export const AddExperienceForm = ({ onAddExperience, onCancel }: AddExperienceFormProps) => {
+  const { searchExperiencePrompts } = useExperiencePrompts();
+  
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -42,7 +44,7 @@ export const AddExperienceForm = ({ onAddExperience, onCancel }: AddExperienceFo
       setSuggestions(searchExperiencePrompts("").slice(0, 3));
       setShowSuggestions(titleQuery.length > 0);
     }
-  }, [titleQuery]);
+  }, [titleQuery, searchExperiencePrompts]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();

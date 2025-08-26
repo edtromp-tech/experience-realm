@@ -53,6 +53,36 @@ export type Database = {
         }
         Relationships: []
       }
+      experience_prompts: {
+        Row: {
+          categories: string[]
+          created_at: string
+          description: string
+          id: string
+          title: string
+          updated_at: string
+          xp: number
+        }
+        Insert: {
+          categories?: string[]
+          created_at?: string
+          description: string
+          id?: string
+          title: string
+          updated_at?: string
+          xp: number
+        }
+        Update: {
+          categories?: string[]
+          created_at?: string
+          description?: string
+          id?: string
+          title?: string
+          updated_at?: string
+          xp?: number
+        }
+        Relationships: []
+      }
       experiences: {
         Row: {
           category: string[]
